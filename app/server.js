@@ -9,6 +9,7 @@ import kleur from 'kleur';
 // Importa tus rutas (asegúrate de crearlas después)
 import { router as userRoutes } from '../routes/userRoutes.js';
 import { router as taskRoutes } from '../routes/taskRoutes.js';
+import { router as authRoutes } from '../routes/authRoutes.js';
 
 dotenv.config();
 
@@ -22,19 +23,20 @@ class Server {
         
         // Configuramos Socket.io
         this.io = new SocketServer(this.server, {
-            cors: { origin: "*" } // Ajustar según necesites en producción
+            cors: { origin: "*" } 
         });
 
         // Paths
         this.paths = {
             users: '/api/users',
-            tasks: '/api/tasks'
+            tasks: '/api/tasks',
+            auth: '/api/auth'
         };
 
         this.conectarMongoose();
         this.middlewares();
         this.routes();
-        this.sockets(); // Nueva sección para la lógica de tiempo real
+        this.sockets(); 
     }
 
     conectarMongoose() {
@@ -53,7 +55,7 @@ class Server {
     middlewares() {
         this.app.use(cors());
         this.app.use(express.json());
-        // Middleware para pasar el 'io' a los controllers si lo necesitas
+        // Middleware para pasar el 'io' a los controllers
         this.app.use((req, res, next) => {
             req.io = this.io;
             next();
@@ -63,6 +65,7 @@ class Server {
     routes() {
         this.app.use(this.paths.users, userRoutes);
         this.app.use(this.paths.tasks, taskRoutes);
+        this.app.use(this.paths.auth, authRoutes);
     }
 
     sockets() {
@@ -76,7 +79,7 @@ class Server {
     }
 
     listen() {
-        // IMPORTANTE: Escuchamos con 'this.server', no con 'this.app'
+        // Escuchamos con 'this.server', no con 'this.app'
         this.server.listen(this.port, () => {
             console.log(kleur.green().bold(`🟢 Servidor con Sockets en puerto: ${this.port}`));
         });

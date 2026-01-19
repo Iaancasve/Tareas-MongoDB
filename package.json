@@ -4,7 +4,7 @@
   "type": "module",
   "main": "app/app.js",
   "scripts": {
-    "dev": "nodemon app/app.js", 
+    "dev": "nodemon app/app.js",
     "start": "node app/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,6 +25,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
     "kleur": "^4.1.5",
     "mongoose": "^8.0.0",
     "socket.io": "^4.7.4"

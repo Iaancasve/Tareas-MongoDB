@@ -1,9 +1,11 @@
 {
   "name": "tareas-mongodb",
   "version": "1.0.0",
-  "description": "",  
-  "main": "app.js",
+  "type": "module",
+  "main": "app/app.js",
   "scripts": {
+    "dev": "nodemon app/app.js", 
+    "start": "node app/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -13,13 +15,21 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/Iaancasve/Tareas-MongoDB/issues"
   },
   "homepage": "https://github.com/Iaancasve/Tareas-MongoDB#readme",
   "dependencies": {
-    "chalk": "^5.6.2",
+    "@faker-js/faker": "^9.4.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "kleur": "^4.1.5",
+    "mongoose": "^8.0.0",
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.11"
   }
 }

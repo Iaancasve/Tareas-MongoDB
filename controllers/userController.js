@@ -47,7 +47,6 @@ const controlador = {
             
             const { id, username, email, password, rol } = req.body;
 
-            
             const usuario = await UserModel.create({ id, username, email, password, rol });
 
             console.log(kleur.green().bold('🔵 Usuario registrado correctamente!'));
@@ -116,7 +115,7 @@ const controlador = {
             }
 
             await UserModel.insertMany(usuariosFaker);
-            console.log(kleur.magenta().bold(`✨ Se han generado ${num} usuarios con Faker`));
+            console.log(kleur.magenta().bold(`Se han generado ${num} usuarios con Faker`));
             res.status(201).json({ msg: `Sistema llenado con ${num} usuarios` });
         } catch (error) {
             console.error(kleur.red().bold('❌ Error al generar usuarios Faker:'), error);

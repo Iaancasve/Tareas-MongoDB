@@ -1,4 +1,5 @@
 import UserModel from '../models/user.js';
+import TaskModel from '../models/task.js';
 import kleur from 'kleur';
 import { faker } from '@faker-js/faker';
 
@@ -8,7 +9,7 @@ const controlador = {
     usuariosGet: async (req, res) => {
         try {
             const personas = await UserModel.find().lean();
-            
+
             if (personas.length > 0) {
                 console.log(kleur.blue().bold('🔵 Listado de usuarios recuperado!'));
                 res.status(200).json(personas);
@@ -25,9 +26,9 @@ const controlador = {
     // Obtener un usuario por ID
     usuarioGet: async (req, res) => {
         try {
-            
+
             const usuario = await UserModel.findOne({ id: req.params.id });
-            
+
             if (usuario) {
                 console.log(kleur.blue().bold(`🔵 Usuario ${req.params.id} encontrado!`));
                 res.status(200).json(usuario);
@@ -41,10 +42,59 @@ const controlador = {
         }
     },
 
+    // Obtener un usuario y sus tareas usando agregate
+    getTareasAgrupadasPorUsuario: async (req, res) => {
+        console.log("He entrado en la función correcta");
+        try {
+            const tareasPorUsuario = await TaskModel.aggregate([
+                {
+                    
+                    $lookup: {
+                        from: 'usuarios',       
+                        localField: 'assignedTo', 
+                        foreignField: 'id',     
+                        as: 'usuario'           
+                    }
+                },
+                {
+                    // Me daba error y la IA me dio esta solucion para que solo me muestre las tareas que tengan un usuario asignado
+                    $match: {
+                        'usuario': { $ne: [] }
+                    }
+                },
+                {
+                    $unwind: '$usuario'
+                },
+                {
+                    //  Agrupamos por el nombre del usuario
+                    $group: {
+                        _id: '$usuario.username',
+                        tareas: {
+                            $push: { 
+                                tareaId: '$_id',
+                                description: '$description',
+                                difficulty: '$difficulty',
+                                status: '$status',
+                                duration: '$duration'
+                            }
+                        }
+                    }
+                },
+            ]);
+
+            console.log(kleur.cyan().bold(' Informe de tareas por usuario generado'));
+            res.status(200).json(tareasPorUsuario);
+
+        } catch (error) {
+            console.error(' Error al obtener tareas por usuario:', error);
+            res.status(500).json({ 'msg': 'Error al obtener el informe de tareas' });
+        }
+    },
+
     // Crear usuario (Registro manual)
     usuariosPost: async (req, res) => {
         try {
-            
+
             const { id, username, email, password, rol } = req.body;
 
             const usuario = await UserModel.create({ id, username, email, password, rol });
@@ -61,8 +111,8 @@ const controlador = {
     usuariosPut: async (req, res) => {
         try {
             const usuarioActualizado = await UserModel.findOneAndUpdate(
-                { id: req.params.id }, 
-                req.body, 
+                { id: req.params.id },
+                req.body,
                 { new: true, runValidators: true }
             );
 
@@ -83,7 +133,7 @@ const controlador = {
     usuariosDelete: async (req, res) => {
         try {
             const usuarioEliminado = await UserModel.deleteOne({ id: req.params.id });
-            
+
             if (usuarioEliminado.deletedCount > 0) {
                 console.log(kleur.red().bold('🔵 Usuario eliminado correctamente!'));
                 res.status(200).json(usuarioEliminado);
@@ -106,10 +156,10 @@ const controlador = {
 
             for (let i = 0; i < num; i++) {
                 usuariosFaker.push({
-                    id: faker.string.uuid(), 
+                    id: faker.string.uuid(),
                     username: faker.internet.userName(),
                     email: faker.internet.email(),
-                    password: 'password123', 
+                    password: 'password123',
                     rol: 'USER'
                 });
             }

@@ -8,6 +8,10 @@ export const taskControlador = {
         try {
             const nuevaTarea = new TaskModel(req.body);
             await nuevaTarea.save();
+
+            const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            req.io.emit('contador-tareas-libres', totalLibres);
+
             console.log(kleur.magenta().bold('Tarea creada y guardada'));
             res.status(201).json(nuevaTarea);
         } catch (error) {
@@ -33,6 +37,9 @@ export const taskControlador = {
             const tarea = await TaskModel.findByIdAndUpdate(id, datos, { new: true, runValidators: true });
             if (!tarea) return res.status(404).json({ msg: 'Tarea no encontrada' });
             
+            const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            req.io.emit('contador-tareas-libres', totalLibres);
+
             console.log(kleur.yellow().bold(`Tarea ${id} editada por Admin`));
             res.status(200).json(tarea);
         } catch (error) {
@@ -51,6 +58,10 @@ export const taskControlador = {
                 { new: true }
             );
             if (!tarea) return res.status(404).json({ msg: 'Tarea no encontrada' });
+
+            
+            const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            req.io.emit('contador-tareas-libres', totalLibres);
 
             console.log(kleur.yellow().bold(`Admin asignó tarea ${idTarea} a usuario ${idUsuarioDestino}`));
             res.status(200).json(tarea);
@@ -73,6 +84,11 @@ export const taskControlador = {
                 { assignedTo: uidToken }, 
                 { new: true }
             );
+
+            
+            const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            req.io.emit('contador-tareas-libres', totalLibres);
+
             console.log(kleur.blue().bold(`Usuario ${uidToken} cogió la tarea ${idTarea}`));
             res.status(200).json(tarea);
         } catch (error) {
@@ -127,7 +143,6 @@ export const taskControlador = {
             await tarea.save();
             
             console.log(kleur.blue().bold(`Tarea ${id} actualizada a: ${nuevoEstado} por ${uidToken}`));
-            
             
             res.status(200).json(tarea);
 
@@ -200,8 +215,8 @@ export const taskControlador = {
     tasksGenerarFaker: async (req, res) => {
         try {
             const { n = 10 } = req.body;
-            const dificultades = TaskModel.dif
-            const estados = TaskModel.dificultades
+            const dificultades = TaskModel.dificultades
+            const estados = TaskModel.estados
             const descripciones = ['Reparar DNS', 'DB Update', 'Security Logs', 'SQL Opt', 'Docker Migration'];
             const tareasNuevas = [];
             for (let i = 0; i < n; i++) {
@@ -214,6 +229,10 @@ export const taskControlador = {
                 });
             }
             await TaskModel.insertMany(tareasNuevas);
+
+            const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            req.io.emit('contador-tareas-libres', totalLibres);
+
             res.status(201).json({ msg: `${n} tareas creadas` });
         } catch (error) {
             res.status(500).json({ msg: 'Error en Faker' });

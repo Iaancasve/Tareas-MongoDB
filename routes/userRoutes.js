@@ -5,16 +5,10 @@ import { esAdmin } from '../middleware/validarRoles.js';
 
 export const router = Router();
 
-// --- 1. RUTAS DE CONSULTA (Cualquier usuario logueado) ---
+// ---  RUTAS DE ADMINISTRACIÓN (Solo ADMIN) ---
 
-// Obtener lista de usuarios 
-router.get('/', [validarJWT], controlador.usuariosGet);
-
-// Obtener datos de un usuario específico
-router.get('/:id', [validarJWT], controlador.usuarioGet);
-
-
-// --- 2. RUTAS DE ADMINISTRACIÓN (Solo ADMIN) ---
+// Usuarios y sus tareas 
+router.get('/informe-tareas', [validarJWT, esAdmin], controlador.getTareasAgrupadasPorUsuario);
 
 // Crear un nuevo usuario manualmente
 router.post('/', [validarJWT, esAdmin], controlador.usuariosPost);
@@ -27,6 +21,15 @@ router.delete('/:id', [validarJWT, esAdmin], controlador.usuariosDelete);
 
 // Generar usuarios de prueba masivamente
 router.post('/faker', [validarJWT, esAdmin], controlador.usuariosGenerarFaker);
+
+// ---  RUTAS DE CONSULTA (Cualquier usuario logueado) ---
+
+// Obtener lista de usuarios 
+router.get('/', [validarJWT], controlador.usuariosGet);
+
+// Obtener datos de un usuario específico
+router.get('/:id', [validarJWT], controlador.usuarioGet);
+
 
 
 export default router;

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas - Cliente</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+            background: #f4f4f4;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .switch {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .switch a {
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="auth-container">
+        <h2 id="auth-title">Login</h2>
+
+        <div id="form-registro" style="display: none;">
+            <input type="text" id="reg-username" placeholder="Nombre de usuario">
+        </div>
+
+        <input type="email" id="auth-email" placeholder="Correo electrónico">
+        <input type="password" id="auth-password" placeholder="Contraseña">
+
+        <button onclick="handleAuth()" id="btn-auth">Entrar</button>
+
+        <div class="switch">
+            <span id="switch-text">¿No tienes cuenta?</span>
+            <a onclick="toggleAuth()" id="switch-link">Regístrate</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:9090/api/auth';
+        let isLogin = true;
+
+        function toggleAuth() {
+            isLogin = !isLogin;
+            document.getElementById('auth-title').innerText = isLogin ? 'Login' : 'Registro';
+            document.getElementById('form-registro').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('btn-auth').innerText = isLogin ? 'Entrar' : 'Registrarse';
+            document.getElementById('switch-text').innerText = isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+            document.getElementById('switch-link').innerText = isLogin ? 'Regístrate' : 'Inicia sesión';
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const username = document.getElementById('reg-username').value;
+
+            const endpoint = isLogin ? '/login' : '/registro';
+            const body = isLogin ? { email, password } : { username, email, password };
+
+            try {
+                const resp = await fetch(API_URL + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await resp.json();
+
+                if (resp.ok) {
+                    alert(isLogin ? '¡Bienvenido!' : 'Usuario creado con éxito');
+                    // Guardamos el token para futuras consultas
+                    localStorage.setItem('x-token', data.token);
+                    localStorage.setItem('user-info', JSON.stringify(data.usuario));
+
+                    s
+                    console.log('Token guardado:', data.token);
+                } else {
+                    alert('Error: ' + data.msg);
+                }
+            } catch (error) {
+                console.error('Error en la petición:', error);
+                alert('No se pudo conectar con el servidor');
+            }
+        }
+    </script>
+
+</body>
+
+</html>

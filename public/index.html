@@ -109,13 +109,14 @@
                 const data = await resp.json();
 
                 if (resp.ok) {
-                    alert(isLogin ? '¡Bienvenido!' : 'Usuario creado con éxito');
-                    // Guardamos el token para futuras consultas
-                    localStorage.setItem('x-token', data.token);
+                    
+                    localStorage.setItem('x-token', data.token); 
                     localStorage.setItem('user-info', JSON.stringify(data.usuario));
 
-                    s
-                    console.log('Token guardado:', data.token);
+                    console.log(isLogin ? 'Login correcto' : 'Registro correcto');
+
+                    
+                    window.location.href = 'task.html';
                 } else {
                     alert('Error: ' + data.msg);
                 }

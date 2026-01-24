@@ -10,7 +10,9 @@ export const taskControlador = {
             await nuevaTarea.save();
 
             const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            
             req.io.emit('contador-tareas-libres', totalLibres);
+            req.io.emit('tarea-nueva-pura', nuevaTarea); 
 
             console.log(kleur.magenta().bold('Tarea creada y guardada'));
             res.status(201).json(nuevaTarea);
@@ -38,7 +40,9 @@ export const taskControlador = {
             if (!tarea) return res.status(404).json({ msg: 'Tarea no encontrada' });
             
             const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+
             req.io.emit('contador-tareas-libres', totalLibres);
+            req.io.emit('tarea-actualizada-pura', tarea);
 
             console.log(kleur.yellow().bold(`Tarea ${id} editada por Admin`));
             res.status(200).json(tarea);
@@ -59,9 +63,10 @@ export const taskControlador = {
             );
             if (!tarea) return res.status(404).json({ msg: 'Tarea no encontrada' });
 
-            
             const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            
             req.io.emit('contador-tareas-libres', totalLibres);
+            req.io.emit('tarea-actualizada-pura', tarea);
 
             console.log(kleur.yellow().bold(`Admin asignó tarea ${idTarea} a usuario ${idUsuarioDestino}`));
             res.status(200).json(tarea);
@@ -85,9 +90,10 @@ export const taskControlador = {
                 { new: true }
             );
 
-            
             const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            
             req.io.emit('contador-tareas-libres', totalLibres);
+            req.io.emit('tarea-actualizada-pura', tarea);
 
             console.log(kleur.blue().bold(`Usuario ${uidToken} cogió la tarea ${idTarea}`));
             res.status(200).json(tarea);
@@ -116,10 +122,10 @@ export const taskControlador = {
         const rolToken = req.roles; 
 
         // Validar que el nuevo estado sea uno de los permitidos
-        const estadosValidos = TaskModel.estados
-        if (!estadosValidos.includes(nuevoEstado)) {
+        const estadosPermitidos = TaskModel.estados;
+        if (!estadosPermitidos.includes(nuevoEstado)) {
             return res.status(400).json({ 
-                msg: `Estado no válido. Los estados permitidos son: ${estadosValidos.join(', ')}` 
+                msg: `Estado no válido. Los estados permitidos son: ${estadosPermitidos.join(', ')}` 
             });
         }
 
@@ -142,6 +148,8 @@ export const taskControlador = {
             tarea.status = nuevoEstado;
             await tarea.save();
             
+            req.io.emit('tarea-actualizada-pura', tarea);
+            
             console.log(kleur.blue().bold(`Tarea ${id} actualizada a: ${nuevoEstado} por ${uidToken}`));
             
             res.status(200).json(tarea);
@@ -156,7 +164,7 @@ export const taskControlador = {
         const { idUsuario, dificultad } = req.params;
         try {
             const query = { assignedTo: idUsuario };
-            if (dificultad) query.difficulty = dificultad;
+            if (dificultad && dificultad !== 'null') query.difficulty = dificultad;
             const tareas = await TaskModel.find(query).lean();
             res.status(200).json(tareas);
         } catch (error) {
@@ -228,10 +236,12 @@ export const taskControlador = {
                     assignedTo: null
                 });
             }
-            await TaskModel.insertMany(tareasNuevas);
+            const docs = await TaskModel.insertMany(tareasNuevas);
 
             const totalLibres = await TaskModel.countDocuments({ assignedTo: null });
+            
             req.io.emit('contador-tareas-libres', totalLibres);
+            docs.forEach(tarea => req.io.emit('tarea-nueva-pura', tarea));
 
             res.status(201).json({ msg: `${n} tareas creadas` });
         } catch (error) {

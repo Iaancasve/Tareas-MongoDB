@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas - Cliente Completo</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 20px; background: #f4f7f6; display: flex; flex-direction: column; height: 100vh; }
+        .grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; flex-grow: 1; }
+        .controls { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-y: auto; }
+        .results { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-y: auto; }
+        .card { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-left: 5px solid #007bff; border-radius: 4px; transition: all 0.3s; position: relative; }
+        .group { margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85em; color: #555; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; cursor: pointer; border: none; border-radius: 4px; background: #28a745; color: white; font-weight: bold; margin-bottom: 5px; }
+        button:hover { opacity: 0.9; }
+        .btn-info { background: #17a2b8; }
+        .btn-danger { background: #dc3545; }
+        .badge { background: #007bff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; }
+        .anim-new { animation: highlight 2s ease-out; }
+        @keyframes highlight { from { background: #e3f2fd; } to { background: white; } }
+    </style>
+</head>
+<body>
+
+    <header style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Sistema de Tareas</h1>
+        <div>
+            Tareas Libres: <span id="count-global" style="font-weight: bold; color: #d32f2f;">0</span>
+            <button onclick="logout()" style="width: auto; margin-left: 20px; background: #666;">Salir</button>
+        </div>
+    </header>
+
+    <div class="grid">
+        <div class="controls">
+            <div class="group">
+                <label>1. Tareas sin asignar (Ordenadas)</label>
+                <button class="btn-info" onclick="consultarSinAsignar()">Ver Disponibles</button>
+            </div>
+
+            <div class="group">
+                <label>2. Complejidad Específica</label>
+                <select id="query-diff">
+                    <option value="XS">XS</option><option value="S">S</option>
+                    <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                </select>
+                <button onclick="consultarDificultadUnica()">Filtrar</button>
+            </div>
+
+            <div class="group">
+                <label>3. Rango de Dificultad</label>
+                <input type="text" id="range-min" placeholder="Mínimo (ej: S)">
+                <input type="text" id="range-max" placeholder="Máximo (ej: L)">
+                <button onclick="consultarRango()">Consultar Rango</button>
+            </div>
+
+            <div class="group">
+                <label>4. Tareas por Persona (ID)</label>
+                <input type="text" id="user-id" placeholder="ID del Usuario">
+                <label>Filtro Dificultad (Opcional)</label>
+                <input type="text" id="user-diff-filter" placeholder="Dificultad">
+                <button onclick="consultarPorPersona()">Buscar por Usuario</button>
+            </div>
+
+            <div class="group">
+                <label>5. Otros</label>
+                <button class="btn-danger" onclick="contarXL()">Contar Máxima Dificultad (XL)</button>
+                <button style="background:#6f42c1" onclick="miResumen()">Mi Resumen Personal</button>
+            </div>
+        </div>
+
+        <div class="results">
+            <h2 id="view-title">Seleccione una consulta</h2>
+            <div id="lista-tareas"></div>
+        </div>
+    </div>
+
+<script>
+    const socket = io();
+    const API_URL = 'http://localhost:9090/api/tasks';
+    const token = localStorage.getItem('x-token');
+    const userInfo = JSON.parse(localStorage.getItem('user-info') || '{}');
+    const miId = userInfo.uid || userInfo._id; 
+    
+    let contextoActual = 'libres'; 
+
+    if (!token) window.location.href = 'index.html';
+
+    // --- LÓGICA WEBSOCKETS ---
+    
+    socket.on('tarea-nueva-pura', (tarea) => {
+        
+        if (contextoActual === 'libres' && !tarea.assignedTo) {
+            renderTarea(tarea, true);
+        }
+        
+    });
+
+    socket.on('tarea-actualizada-pura', (tarea) => {
+        const el = document.getElementById(`t-${tarea._id}`);
+        
+        
+        if (contextoActual === 'libres' && tarea.assignedTo) {
+            if (el) {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300);
+            }
+            return;
+        }
+
+        
+        if (contextoActual === 'miresumen') {
+            if (tarea.assignedTo === miId) {
+                
+                if (!el) renderTarea(tarea, true);
+                else {
+                    el.querySelector('.status-val').innerText = tarea.status;
+                    el.querySelector('.assign-val').innerText = tarea.assignedTo;
+                }
+            } else {
+                
+                if (el) el.remove();
+            }
+            return;
+        }
+
+        
+        if (el) {
+            el.querySelector('.status-val').innerText = tarea.status;
+            el.querySelector('.assign-val').innerText = tarea.assignedTo || 'Libre';
+            
+            
+            if (contextoActual === 'persona') {
+                const searchUid = document.getElementById('user-id').value;
+                if (tarea.assignedTo !== searchUid) el.remove();
+            }
+        }
+    });
+
+    socket.on('contador-tareas-libres', (num) => {
+        document.getElementById('count-global').innerText = num;
+    });
+
+    // --- FUNCIONES DE CONSULTA ---
+
+    async function apiCall(url) {
+        const res = await fetch(url, { headers: { 'x-token': token }});
+        const data = await res.json();
+        return res.ok ? data : [];
+    }
+
+    function renderLista(tareas, titulo) {
+        document.getElementById('view-title').innerText = titulo;
+        const contenedor = document.getElementById('lista-tareas');
+        contenedor.innerHTML = '';
+        const arr = Array.isArray(tareas) ? tareas : (tareas.tareas || []);
+        arr.forEach(t => renderTarea(t));
+    }
+
+    function renderTarea(t, isNew = false) {
+        const contenedor = document.getElementById('lista-tareas');
+        const html = `
+            <div class="card ${isNew ? 'anim-new' : ''}" id="t-${t._id}">
+                <strong>${t.description}</strong><br>
+                <small>Dif: <span class="badge">${t.difficulty}</span> | Duración: ${t.duration}h</small><br>
+                <small>Estado: <span class="status-val">${t.status}</span> | Asignado: <span class="assign-val">${t.assignedTo || 'Libre'}</span></small>
+            </div>
+        `;
+        if (isNew) contenedor.insertAdjacentHTML('afterbegin', html);
+        else contenedor.insertAdjacentHTML('beforeend', html);
+    }
+
+    async function consultarSinAsignar() {
+        contextoActual = 'libres';
+        const data = await apiCall(`${API_URL}/disponibles`);
+        renderLista(data, "Tareas sin asignar (Ordenadas)");
+    }
+
+    async function consultarDificultadUnica() {
+        contextoActual = 'especifica';
+        const val = document.getElementById('query-diff').value;
+        const data = await apiCall(`${API_URL}/rango?min=${val}&max=${val}`);
+        renderLista(data, `Tareas de dificultad ${val}`);
+    }
+
+    async function consultarRango() {
+        contextoActual = 'rango';
+        const min = document.getElementById('range-min').value;
+        const max = document.getElementById('range-max').value;
+        const data = await apiCall(`${API_URL}/rango?min=${min}&max=${max}`);
+        renderLista(data, `Rango: ${min} a ${max}`);
+    }
+
+    async function consultarPorPersona() {
+        contextoActual = 'persona';
+        const uid = document.getElementById('user-id').value;
+        const diff = document.getElementById('user-diff-filter').value || 'null';
+        const data = await apiCall(`${API_URL}/usuario/${uid}/${diff}`);
+        renderLista(data, `Tareas del usuario ${uid}`);
+    }
+
+    async function contarXL() {
+        const data = await apiCall(`${API_URL}/count-xl`);
+        alert(`Total de tareas de máxima dificultad (XL): ${data.totalXL}`);
+    }
+
+    async function miResumen() {
+        contextoActual = 'miresumen';
+        const data = await apiCall(`${API_URL}/mi-resumen`);
+        renderLista(data, "Mi Resumen Personal");
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+
+    
+</script>
+</body>
+</html>

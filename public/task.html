@@ -81,7 +81,8 @@
     const API_URL = 'http://localhost:9090/api/tasks';
     const token = localStorage.getItem('x-token');
     const userInfo = JSON.parse(localStorage.getItem('user-info') || '{}');
-    const miId = userInfo.uid || userInfo._id; 
+    
+    const miId = String(userInfo._id); 
     
     let contextoActual = 'libres'; 
 
@@ -90,18 +91,17 @@
     // --- LÓGICA WEBSOCKETS ---
     
     socket.on('tarea-nueva-pura', (tarea) => {
-        
         if (contextoActual === 'libres' && !tarea.assignedTo) {
             renderTarea(tarea, true);
         }
-        
     });
 
     socket.on('tarea-actualizada-pura', (tarea) => {
         const el = document.getElementById(`t-${tarea._id}`);
         
-        
-        if (contextoActual === 'libres' && tarea.assignedTo) {
+        const assignedToId = tarea.assignedTo ? String(tarea.assignedTo) : null;
+
+        if (contextoActual === 'libres' && assignedToId) {
             if (el) {
                 el.style.opacity = '0';
                 setTimeout(() => el.remove(), 300);
@@ -111,15 +111,14 @@
 
         
         if (contextoActual === 'miresumen') {
-            if (tarea.assignedTo === miId) {
-                
-                if (!el) renderTarea(tarea, true);
-                else {
+            if (assignedToId === miId) {
+                if (!el) {
+                    renderTarea(tarea, true);
+                } else {
                     el.querySelector('.status-val').innerText = tarea.status;
-                    el.querySelector('.assign-val').innerText = tarea.assignedTo;
+                    el.querySelector('.assign-val').innerText = assignedToId;
                 }
             } else {
-                
                 if (el) el.remove();
             }
             return;
@@ -128,12 +127,11 @@
         
         if (el) {
             el.querySelector('.status-val').innerText = tarea.status;
-            el.querySelector('.assign-val').innerText = tarea.assignedTo || 'Libre';
-            
+            el.querySelector('.assign-val').innerText = assignedToId || 'Libre';
             
             if (contextoActual === 'persona') {
                 const searchUid = document.getElementById('user-id').value;
-                if (tarea.assignedTo !== searchUid) el.remove();
+                if (assignedToId !== searchUid) el.remove();
             }
         }
     });
@@ -145,26 +143,35 @@
     // --- FUNCIONES DE CONSULTA ---
 
     async function apiCall(url) {
-        const res = await fetch(url, { headers: { 'x-token': token }});
-        const data = await res.json();
-        return res.ok ? data : [];
+        try {
+            const res = await fetch(url, { headers: { 'x-token': token }});
+            const data = await res.json();
+            return res.ok ? data : [];
+        } catch (e) {
+            return [];
+        }
     }
 
     function renderLista(tareas, titulo) {
         document.getElementById('view-title').innerText = titulo;
         const contenedor = document.getElementById('lista-tareas');
         contenedor.innerHTML = '';
+        
+        
         const arr = Array.isArray(tareas) ? tareas : (tareas.tareas || []);
         arr.forEach(t => renderTarea(t));
     }
 
     function renderTarea(t, isNew = false) {
         const contenedor = document.getElementById('lista-tareas');
+        
+        const displayAssign = t.assignedTo ? String(t.assignedTo) : 'Libre';
+        
         const html = `
             <div class="card ${isNew ? 'anim-new' : ''}" id="t-${t._id}">
                 <strong>${t.description}</strong><br>
                 <small>Dif: <span class="badge">${t.difficulty}</span> | Duración: ${t.duration}h</small><br>
-                <small>Estado: <span class="status-val">${t.status}</span> | Asignado: <span class="assign-val">${t.assignedTo || 'Libre'}</span></small>
+                <small>Estado: <span class="status-val">${t.status}</span> | Asignado: <span class="assign-val">${displayAssign}</span></small>
             </div>
         `;
         if (isNew) contenedor.insertAdjacentHTML('afterbegin', html);
@@ -177,6 +184,13 @@
         renderLista(data, "Tareas sin asignar (Ordenadas)");
     }
 
+    async function miResumen() {
+        contextoActual = 'miresumen';
+        const data = await apiCall(`${API_URL}/mi-resumen`);
+        renderLista(data, "Mi Resumen Personal");
+    }
+
+    
     async function consultarDificultadUnica() {
         contextoActual = 'especifica';
         const val = document.getElementById('query-diff').value;
@@ -205,18 +219,10 @@
         alert(`Total de tareas de máxima dificultad (XL): ${data.totalXL}`);
     }
 
-    async function miResumen() {
-        contextoActual = 'miresumen';
-        const data = await apiCall(`${API_URL}/mi-resumen`);
-        renderLista(data, "Mi Resumen Personal");
-    }
-
     function logout() {
         localStorage.clear();
         window.location.href = 'index.html';
     }
-
-    
 </script>
 </body>
 </html>

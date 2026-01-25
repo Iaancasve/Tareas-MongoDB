@@ -1,0 +1,679 @@
+{
+  "info": {
+    "_postman_id": "d4ffa13a-f45b-4763-acb9-3731f94151bd",
+    "name": "Tareas-Mongo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48599475",
+    "_collection_link": "https://go.postman.co/collection/48599475-d4ffa13a-f45b-4763-acb9-3731f94151bd?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "CRUD USUARIOS",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY5MjcwNjcxLCJleHAiOjE3NjkyODUwNzF9.X1Ai8DqLg-6kF2NLYBo47MnVsb8tNJMOW6wWnM3r8DE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9090/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Usuario por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:9090/api/users/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Usuarios y sus tareas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTk5NDY3LCJleHAiOjE3NjkwMTM4Njd9.Qv9sITu5MvKISxijrQT1LhDt9632LWJEfhn9RLGMWg0",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9090/api/users/informe-tareas",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users",
+                "informe-tareas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": \"2\",\r\n  \"username\": \"Diego\",\r\n  \"email\": \"diego@test.com\",\r\n  \"password\": \"1234abc.-\",\r\n  \"rol\": \"USER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Modificar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"IanActualizado\",\r\n  \"rol\": \"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/users/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Borrar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:9090/api/users/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Creacion masiva de usuarios",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"n\" : 15\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/users/faker",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "users",
+                "faker"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CRUD TAREAS",
+      "item": [
+        {
+          "name": "Listar tareas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9090/api/tasks",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear tarea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"description\": \"Dormir a diego\",\r\n  \"duration\": 2,\r\n  \"difficulty\": \"S\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/tasks",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Coger tarea",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3Njg5Mjg2MDMsImV4cCI6MTc2ODk0MzAwM30.uf9HqFyCuWeVplr2ccrjyOAwv2Ol97ghKJNfjLwlJ2A",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"accion\": \"coger\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/coger-tarea/696fb57d06bc856409c36049",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "coger-tarea",
+                "696fb57d06bc856409c36049"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Creacion masiva de tareas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"n\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/faker",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "faker"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filtrar por rango de dificultad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/rango?min=S&max=L",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "rango"
+              ],
+              "query": [
+                {
+                  "key": "min",
+                  "value": "S"
+                },
+                {
+                  "key": "max",
+                  "value": "L"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Numero de tareas de maxima dificultad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/count-xl",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "count-xl"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar estado tarea",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nuevoEstado\": \"haciendo\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/estado/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "estado",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Asignar Tarea a usuario como admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIiwicm9sZXMiOlsiQURNSU4iXSwiaWF0IjoxNzY4OTI2NDU5LCJleHAiOjE3Njg5NDA4NTl9.wT9de47czyrqIyZAcwV_nqRbuAYRLSzoNN5Ax5f3Gk4",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/admin-asignar/696eb3068aafdf427a2cd8b0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "admin-asignar",
+                "696eb3068aafdf427a2cd8b0"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver tareas disponibles",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Mis tareas",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Tareas de usuario por dificultad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3Njg5Mjg2MDMsImV4cCI6MTc2ODk0MzAwM30.uf9HqFyCuWeVplr2ccrjyOAwv2Ol97ghKJNfjLwlJ2A",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9090/api/tasks/usuario/1/XL",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "tasks",
+                "usuario",
+                "1",
+                "XL"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AUTH",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"iancu@test.com\", \r\n    \"password\": \"1234abc.-\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registro",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"sergio\",\r\n    \"email\": \"sergio@test.com\",\r\n    \"password\": \"1234abc.-\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/api/auth/registro",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "api",
+                "auth",
+                "registro"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query {\r\n  # 1. Probar todos los usuarios\r\n  getUsers {\r\n    username\r\n    email\r\n    rol\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar usuarios con sus tareas",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query {\r\n  getTareasAgrupadas {\r\n    _id\r\n    tareas {\r\n      description\r\n      duration\r\n    }\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear tarea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIyIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE3NjkwMTY1MzcsImV4cCI6MTc2OTAzMDkzN30.5uTqHJjvr8ppnZnCiujsmMPdq1p5vhCONy8XZjW-hxo",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  agregarTarea(\r\n    description: \"Probar JWT con GQL\", \r\n    duration: 10, \r\n    difficulty: \"XL\", \r\n    assignedTo: \"1\"\r\n  ) {\r\n    id\r\n    description\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9090/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9090",
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

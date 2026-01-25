@@ -131,7 +131,7 @@ class Server {
 
         // 3. Levantar el servidor HTTP
         this.server.listen(this.port, () => {
-            console.log(kleur.green().bold(`\n🟢 Servidor REST y Sockets en puerto: ${this.port}`));
+            console.log(kleur.green().bold(`\n🟢 Servidor REST y Sockets en puerto: http://localhost:${this.port}`));
             console.log(kleur.magenta().bold(`🚀 GraphQL listo en: http://localhost:${this.port}${this.graphQLPath}`));
         });
     }
